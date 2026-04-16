@@ -1,0 +1,51 @@
+id,name,location,capacity_min,capacity_max,event_types,price_per_day,rating,parking,catering,description,contact_email,contact_phone
+1,Al-Hamra Event Hall,Gulberg,100,500,Wedding;Mehndi;Walima,85000,4.8,Yes,Yes,Elegant hall with modern decor and spacious lawn perfect for grand weddings.,alhamra@shaadihall.com,0300-1111001
+2,Royal Garden Hall,DHA Phase 1,150,600,Wedding;Walima;Corporate Function,95000,4.7,Yes,Yes,Luxurious venue with lush gardens and state of the art facilities.,royalgarden@shaadihall.com,0300-1111002
+3,Pearl Continental Banquet,Cantt,200,800,Wedding;Mehndi;Walima;Corporate Function,100000,4.9,Yes,Yes,Premium banquet hall with top class catering and elegant interiors.,pearlbanquet@shaadihall.com,0300-1111003
+4,Zaman Park Hall,Model Town,100,400,Wedding;Birthday;Mehndi,60000,4.3,Yes,No,Affordable and spacious hall in a prime location with ample parking.,zamanpark@shaadihall.com,0300-1111004
+5,Johar Mahal,Johar Town,150,500,Wedding;Mehndi;Walima,75000,4.5,Yes,Yes,Beautiful hall with traditional decor ideal for Pakistani weddings.,joharmahal@shaadihall.com,0300-1111005
+6,Bahria Grand Hall,Bahria Town,200,700,Wedding;Walima;Corporate Function,90000,4.6,Yes,Yes,Grand venue inside Bahria Town with modern amenities and great ambiance.,bahriagrand@shaadihall.com,0300-1111006
+7,Valencia Banquet,Valencia,100,350,Wedding;Birthday;Mehndi,55000,4.2,Yes,No,Cozy and elegant banquet hall perfect for small to medium events.,valenciabanquet@shaadihall.com,0300-1111007
+8,Askari Events Hall,Askari 10,150,500,Wedding;Mehndi;Walima,80000,4.6,Yes,Yes,Well maintained hall with military precision service and great facilities.,askariEvents@shaadihall.com,0300-1111008
+9,Garden Town Marquee,Garden Town,100,400,Wedding;Birthday;Corporate Function,65000,4.4,Yes,Yes,Charming marquee style venue surrounded by beautiful gardens.,gardentown@shaadihall.com,0300-1111009
+10,Faisal Town Hall,Faisal Town,100,300,Birthday;Mehndi;Wedding,50000,4.1,Yes,No,Budget friendly hall with clean interiors and good location.,faisaltown@shaadihall.com,0300-1111010
+11,Shadman Palace,Shadman,150,550,Wedding;Walima;Mehndi,78000,4.5,Yes,Yes,Regal palace style venue with ornate decor and professional staff.,shadmanpalace@shaadihall.com,0300-1111011
+12,Township Grand,Township,100,400,Wedding;Birthday;Corporate Function,60000,4.2,Yes,No,Spacious hall in Township ideal for mid-size gatherings and functions.,townshipgrand@shaadihall.com,0300-1111012
+13,PAF Glamour Hall,PAF Colony,150,500,Wedding;Mehndi;Walima,72000,4.4,Yes,Yes,Glamorous hall near PAF Colony with excellent catering services.,pafglamour@shaadihall.com,0300-1111013
+14,Wapda Town Festive Hall,Wapda Town,100,350,Birthday;Wedding;Mehndi,58000,4.1,Yes,No,Festive and colorful hall perfect for birthdays and small weddings.,wapdafestive@shaadihall.com,0300-1111014
+15,Allama Iqbal Banquet,Allama Iqbal Town,150,500,Wedding;Walima;Corporate Function,70000,4.3,Yes,Yes,Classic banquet hall with modern facilities in the heart of Allama Iqbal Town.,allamaiqbal@shaadihall.com,0300-1111015
+16,DHA Luxury Hall,DHA Phase 5,200,700,Wedding;Mehndi;Walima,98000,4.8,Yes,Yes,Ultra luxurious venue in DHA Phase 5 with breathtaking interiors.,dhaluxury@shaadihall.com,0300-1111016
+17,Gulberg Fiesta,Gulberg,100,300,Birthday;Corporate Function;Mehndi,55000,4.2,Yes,No,Modern and vibrant hall perfect for corporate events and birthday parties.,gulbergfiesta@shaadihall.com,0300-1111017
+18,Model Town Marquee,Model Town,150,600,Wedding;Walima;Mehndi,82000,4.6,Yes,Yes,Grand marquee in Model Town with lush outdoor space and elegant decor.,modeltownmarquee@shaadihall.com,0300-1111018
+19,Johar Bliss Hall,Johar Town,100,400,Birthday;Wedding;Mehndi,62000,4.3,Yes,Yes,Blissful venue with warm ambiance and excellent customer service.,joharbliss@shaadihall.com,0300-1111019
+20,Cantt Prestige Hall,Cantt,200,800,Wedding;Walima;Corporate Function,99000,4.9,Yes,Yes,Prestigious hall in Cantt area known for impeccable service and luxury.,canttprestige@shaadihall.com,0300-1111020
+21,Bahria Elegance,Bahria Town,150,500,Wedding;Mehndi;Birthday,85000,4.5,Yes,Yes,Elegant and spacious hall in Bahria Town with beautiful floral decor.,bahriaelegance@shaadihall.com,0300-1111021
+22,Valencia Rose Hall,Valencia,100,350,Wedding;Birthday;Mehndi,57000,4.2,Yes,No,Rose themed hall with romantic ambiance ideal for intimate events.,valenciarose@shaadihall.com,0300-1111022
+23,Askari Majesty Hall,Askari 11,150,600,Wedding;Walima;Corporate Function,88000,4.7,Yes,Yes,Majestic hall with military grade facilities and premium catering.,askarmajesty@shaadihall.com,0300-1111023
+24,Garden Town Royal,Garden Town,100,400,Wedding;Mehndi;Birthday,67000,4.4,Yes,Yes,Royal themed banquet with garden views and superb catering options.,gardentownroyal@shaadihall.com,0300-1111024
+25,Faisal Festive Marquee,Faisal Town,150,500,Wedding;Mehndi;Walima,73000,4.3,Yes,Yes,Festive marquee style venue ideal for traditional Pakistani weddings.,faisalfestive@shaadihall.com,0300-1111025
+26,Shadman Regal Hall,Shadman,100,400,Birthday;Corporate Function;Wedding,63000,4.3,Yes,No,Regal and affordable hall in Shadman with clean modern interiors.,shadmanregal@shaadihall.com,0300-1111026
+27,Township Celebrations,Township,100,300,Birthday;Mehndi;Wedding,52000,4.0,Yes,No,Cheerful venue perfect for birthday parties and small family functions.,townshipcelebrations@shaadihall.com,0300-1111027
+28,PAF Royal Banquet,PAF Colony,200,700,Wedding;Walima;Corporate Function,92000,4.7,Yes,Yes,Royal banquet hall near PAF Colony with outstanding decor and service.,pafroyal@shaadihall.com,0300-1111028
+29,Wapda Grand Marquee,Wapda Town,150,500,Wedding;Mehndi;Walima,76000,4.4,Yes,Yes,Grand marquee in Wapda Town with beautiful lighting and decor.,wapdagrand@shaadihall.com,0300-1111029
+30,Iqbal Town Festive,Allama Iqbal Town,100,350,Birthday;Wedding;Mehndi,56000,4.1,Yes,No,Festive and budget friendly hall in Iqbal Town for all occasions.,iqbaltownfestive@shaadihall.com,0300-1111030
+31,DHA Pearl Banquet,DHA Phase 6,200,650,Wedding;Walima;Mehndi,96000,4.8,Yes,Yes,Pearl class banquet hall in DHA Phase 6 with top notch facilities.,dhapearl@shaadihall.com,0300-1111031
+32,Gulberg Grand Marquee,Gulberg,200,700,Wedding;Walima;Corporate Function,97000,4.8,Yes,Yes,One of Gulberg finest venues with grand architecture and lush lawns.,gulberggrand@shaadihall.com,0300-1111032
+33,Model Town Celebrations,Model Town,100,350,Birthday;Mehndi;Corporate Function,59000,4.2,Yes,No,Cheerful celebration hall in Model Town for birthdays and corporate events.,modeltowncelebrations@shaadihall.com,0300-1111033
+34,Johar Grand Palace,Johar Town,200,700,Wedding;Walima;Mehndi,91000,4.7,Yes,Yes,Grand palace style venue in Johar Town with exceptional hospitality.,johargrandpalace@shaadihall.com,0300-1111034
+35,Cantt Elegance Hall,Cantt,150,500,Wedding;Mehndi;Birthday,83000,4.6,Yes,Yes,Elegant hall in Cantt with charming interiors and reliable catering.,canttelegance@shaadihall.com,0300-1111035
+36,Bahria Prestige Marquee,Bahria Town,200,800,Wedding;Walima;Corporate Function,100000,4.9,Yes,Yes,Most prestigious marquee in Bahria Town with world class facilities.,bahriaPrestige@shaadihall.com,0300-1111036
+37,Valencia Grand Hall,Valencia,150,500,Wedding;Mehndi;Walima,71000,4.4,Yes,Yes,Grand hall in Valencia with beautiful decor and professional event management.,valenciagrand@shaadihall.com,0300-1111037
+38,Askari Celebrations,Askari 14,100,350,Birthday;Mehndi;Wedding,61000,4.3,Yes,No,Celebration hall in Askari 14 with modern facilities and ample space.,askaricelebrations@shaadihall.com,0300-1111038
+39,Garden Town Festive,Garden Town,100,300,Birthday;Corporate Function;Mehndi,53000,4.1,Yes,No,Festive venue in Garden Town perfect for small to medium sized events.,gardentownfestive@shaadihall.com,0300-1111039
+40,Faisal Town Royale,Faisal Town,150,500,Wedding;Walima;Mehndi,74000,4.4,Yes,Yes,Royale class hall in Faisal Town with premium services and great ambiance.,faisaltownroyale@shaadihall.com,0300-1111040
+41,Shadman Grand Banquet,Shadman,200,650,Wedding;Walima;Corporate Function,93000,4.7,Yes,Yes,Grand banquet hall in Shadman with magnificent decor and expert catering.,shadmangrand@shaadihall.com,0300-1111041
+42,Township Mahal,Township,150,500,Wedding;Mehndi;Birthday,68000,4.3,Yes,Yes,Mahal style venue in Township with traditional decor and warm hospitality.,townshipmahal@shaadihall.com,0300-1111042
+43,PAF Festive Hall,PAF Colony,100,350,Birthday;Mehndi;Corporate Function,57000,4.2,Yes,No,Festive and affordable hall near PAF Colony for all types of events.,paffestive@shaadihall.com,0300-1111043
+44,Wapda Elegance Hall,Wapda Town,150,500,Wedding;Walima;Mehndi,77000,4.5,Yes,Yes,Elegant hall in Wapda Town with sophisticated decor and great service.,wapdaelegance@shaadihall.com,0300-1111044
+45,Iqbal Town Grand Marquee,Allama Iqbal Town,200,700,Wedding;Walima;Corporate Function,89000,4.6,Yes,Yes,Grand marquee in Iqbal Town with sprawling lawns and premium facilities.,iqbaltowngrand@shaadihall.com,0300-1111045
+46,DHA Celebrations Hall,DHA Phase 4,100,400,Birthday;Mehndi;Corporate Function,64000,4.3,Yes,Yes,Modern celebrations hall in DHA Phase 4 with vibrant decor and good service.,dhacelebrations@shaadihall.com,0300-1111046
+47,Gulberg Prestige Banquet,Gulberg,150,550,Wedding;Mehndi;Walima,86000,4.7,Yes,Yes,Prestige banquet in Gulberg with refined elegance and top tier catering.,gulbergprestige@shaadihall.com,0300-1111047
+48,Model Town Grand Palace,Model Town,200,750,Wedding;Walima;Corporate Function,94000,4.8,Yes,Yes,Grand palace in Model Town known for its royal ambiance and flawless service.,modeltowngrandpalace@shaadihall.com,0300-1111048
+49,Johar Festive Marquee,Johar Town,100,350,Birthday;Mehndi;Corporate Function,54000,4.1,Yes,No,Festive marquee in Johar Town perfect for birthdays and small celebrations.,joharfestive@shaadihall.com,0300-1111049
+50,Cantt Royal Mahal,Cantt,200,800,Wedding;Walima;Mehndi,99000,4.9,Yes,Yes,The most royal venue in Cantt area with unmatched luxury and hospitality.,canttroyalmahal@shaadihall.com,0300-1111050

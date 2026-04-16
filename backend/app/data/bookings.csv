@@ -1,0 +1,21 @@
+booking_id,hall_id,customer_name,customer_email,customer_phone,event_type,event_date,guests,status,booked_at
+B001,1,Ahmed Khan,ahmed@gmail.com,0301-2222001,Wedding,2025-05-10,300,confirmed,2025-04-01
+B002,3,Sara Ali,sara@gmail.com,0301-2222002,Corporate Function,2025-05-15,400,confirmed,2025-04-02
+B003,5,Bilal Hussain,bilal@gmail.com,0301-2222003,Mehndi,2025-05-20,200,confirmed,2025-04-03
+B004,8,Fatima Malik,fatima@gmail.com,0301-2222004,Wedding,2025-06-01,350,confirmed,2025-04-04
+B005,12,Usman Raza,usman@gmail.com,0301-2222005,Birthday,2025-06-05,150,confirmed,2025-04-05
+B006,16,Ayesha Tariq,ayesha@gmail.com,0301-2222006,Wedding,2025-06-10,500,confirmed,2025-04-06
+B007,20,Hamza Sheikh,hamza@gmail.com,0301-2222007,Walima,2025-06-15,600,confirmed,2025-04-07
+B008,2,Zainab Qureshi,zainab@gmail.com,0301-2222008,Wedding,2025-06-20,400,confirmed,2025-04-08
+B009,7,Omar Farooq,omar@gmail.com,0301-2222009,Birthday,2025-06-25,100,confirmed,2025-04-09
+B010,11,Nadia Iqbal,nadia@gmail.com,0301-2222010,Mehndi,2025-07-01,300,confirmed,2025-04-10
+B011,15,Tariq Mehmood,tariq@gmail.com,0301-2222011,Corporate Function,2025-07-05,250,confirmed,2025-04-11
+B012,23,Hina Baig,hina@gmail.com,0301-2222012,Wedding,2025-07-10,450,confirmed,2025-04-12
+B013,28,Kamran Javed,kamran@gmail.com,0301-2222013,Walima,2025-07-15,500,confirmed,2025-04-13
+B014,32,Sana Mirza,sana@gmail.com,0301-2222014,Wedding,2025-07-20,600,confirmed,2025-04-14
+B015,36,Adnan Chaudhry,adnan@gmail.com,0301-2222015,Corporate Function,2025-07-25,700,confirmed,2025-04-15
+B016,41,Rabia Waheed,rabia@gmail.com,0301-2222016,Wedding,2025-08-01,500,confirmed,2025-04-16
+B017,45,Faisal Gondal,faisal@gmail.com,0301-2222017,Walima,2025-08-05,600,confirmed,2025-04-17
+B018,48,Amna Butt,amna@gmail.com,0301-2222018,Wedding,2025-08-10,700,confirmed,2025-04-18
+B019,50,Rizwan Ashraf,rizwan@gmail.com,0301-2222019,Mehndi,2025-08-15,400,confirmed,2025-04-19
+B020,6,Maham Saleem,maham@gmail.com,0301-2222020,Birthday,2025-08-20,200,confirmed,2025-04-20
