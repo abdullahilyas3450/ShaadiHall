@@ -3,10 +3,12 @@ import pandas as pd
 from datetime import datetime
 from langchain_core.tools import tool
 from .utility import _send_confirmation_email
+import json
+import pandas as pd
 
 
 HALLS_CSV    = "halls.csv"
-BOOKINGS_CSV = "bookings.csv"
+BOOKINGS_CSV = "/home/abdullah/Desktop/ShaadiHall/backend/app/data/bookings.csv"
 
 
 @tool
@@ -146,4 +148,62 @@ def confirm_booking(
         "status":     "confirmed",
         "email_sent": email_status,
         "message":    f"Booking {new_id} confirmed for {hall_name} on {event_date}!"
+    })
+
+
+@tool
+def check_hall_availability(
+    hall_id: int,
+    date: str
+) -> str:
+    """
+    Check whether a specific hall is available on a given date.
+
+    Args:
+        hall_id: numeric ID of the hall to check
+        date: event date in YYYY-MM-DD format
+
+    Returns:
+        JSON string indicating availability status
+    """
+
+    halls_df    = pd.read_csv("/home/abdullah/Desktop/ShaadiHall/backend/app/data/halls.csv")
+    bookings_df = pd.read_csv("/home/abdullah/Desktop/ShaadiHall/backend/app/data/bookings.csv")
+
+    # Verify the hall exists
+    hall_row = halls_df[halls_df["id"] == hall_id]
+    if hall_row.empty:
+        return json.dumps({
+            "available": False,
+            "error": f"No hall found with ID {hall_id}."
+        })
+
+    hall_name = hall_row.iloc[0]["name"]
+
+    # Check for a confirmed booking on that date for this hall
+    conflict = bookings_df[
+        (bookings_df["hall_id"] == hall_id) &
+        (bookings_df["event_date"] == date) &
+        (bookings_df["status"] == "confirmed")
+    ]
+
+    if not conflict.empty:
+        booking = conflict.iloc[0]
+        return json.dumps({
+            "available": False,
+            "hall_id": hall_id,
+            "hall_name": hall_name,
+            "date": date,
+            "message": (
+                f"Sorry, {hall_name} is not available on {date}. "
+                f"It is already booked for a {booking['event_type']} event."
+            )
+        })
+
+    return json.dumps({
+        "available": True,
+        "hall_id": hall_id,
+        "hall_name": hall_name,
+        "date": date,
+        "message": f"Great news! {hall_name} is available on {date}."
     })
