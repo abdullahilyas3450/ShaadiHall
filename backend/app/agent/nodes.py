@@ -1,45 +1,42 @@
-import os
-
 from langchain_openrouter import ChatOpenRouter
-from typing import Annotated, TypedDict, Optional
+from typing import Annotated, TypedDict
 
 # from langchain_anthropic import ChatAnthropic
 
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, ToolMessage
+from langchain_core.messages import SystemMessage
 from .tools import search_available_halls, confirm_booking
 from langgraph.graph.message import add_messages
-from langgraph.graph import StateGraph, END
-from langgraph.prebuilt import ToolNode
+from langgraph.graph import  END
 from dotenv import load_dotenv      
 load_dotenv()  # Load environment variables from .env file
 
 
-# from langchain_anthropic import ChatAnthropic
-from dotenv import load_dotenv      
-load_dotenv()  # Load environment variables from .env file
+
 
 
 class BookingState(TypedDict):
     messages: Annotated[list, add_messages]
 
 
-# ─────────────────────────────────────────────
-# AGENT SETUP
-# ─────────────────────────────────────────────
 
 TOOLS = [search_available_halls, confirm_booking]
 
-llm= ChatGoogleGenerativeAI(
-    model="gemini-3-flash-preview",
-    temperature=1.0,  # Gemini 3.0+ defaults to 1.0
-    max_tokens=None,
-    timeout=None,
+# llm= ChatGoogleGenerativeAI(
+#     model="gemini-3-flash-preview",
+#     temperature=1.0,  # Gemini 3.0+ defaults to 1.0
+#     max_tokens=None,
+#     timeout=None,
+#     max_retries=2,
+#     api_key="AIzaSyBmSsSLIuOKoNMrntNqvjKNs_8gL5j2vNE"
+#     # other params...
+# ).bind_tools(TOOLS)
+
+llm = ChatOpenRouter(
+    model="google/gemini-2.5-flash-lite",
+    temperature=0,
+    max_tokens=500,
     max_retries=2,
-    api_key="AIzaSyBmSsSLIuOKoNMrntNqvjKNs_8gL5j2vNE"
-    # other params...
-).bind_tools(TOOLS)
+)
 
 SYSTEM_PROMPT = """You are a friendly and professional hall booking assistant for ShadiHall.pk in Lahore, Pakistan.
 Your job is to help customers find and book banquet halls for their events.
