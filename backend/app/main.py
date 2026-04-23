@@ -11,4 +11,4 @@ while True:
          {"messages": [HumanMessage(content=user_input)]},
          config=configurable
      )
-     print("Agent:", response['messages'][-1].content.text)
+     print("Agent:", response['messages'][-1].content)
