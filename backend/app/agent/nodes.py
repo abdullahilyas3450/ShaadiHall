@@ -32,7 +32,7 @@ TOOLS = [search_available_halls, confirm_booking, check_hall_availability]
 # ).bind_tools(TOOLS)
 
 llm = ChatOpenRouter(
-    model="google/gemini-2.5-flash-lite",
+    model="openrouter/free",
     temperature=0,
     max_tokens=500,
     max_retries=2,
@@ -84,9 +84,9 @@ RESPONSE STYLE:
 - Never fabricate hall data — only use results from tool responses"""
 
 
-def agent_node(state: BookingState):
+async def agent_node(state: BookingState):
     messages = [SystemMessage(content=SYSTEM_PROMPT)] + state["messages"]
-    response = llm.invoke(messages)
+    response = await llm.ainvoke(messages)
     return {
         "messages": state["messages"] + [response]
     }

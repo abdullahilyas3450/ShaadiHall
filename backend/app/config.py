@@ -14,7 +14,12 @@ class Settings(BaseSettings):
     
     ANTHROPIC_API_KEY: str
     
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+    ]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
