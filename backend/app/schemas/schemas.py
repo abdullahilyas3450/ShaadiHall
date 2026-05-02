@@ -106,3 +106,5 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     message: str
+    halls: Optional[List[dict]] = None
+    booking: Optional[dict] = None

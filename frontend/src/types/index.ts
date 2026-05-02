@@ -62,9 +62,25 @@ export interface AuthTokens {
   refresh_token: string;
 }
 
+export interface ChatHall {
+  id: string;
+  name: string;
+  location: string;
+  capacity: number;
+  price_per_day: number;
+  description: string;
+  image_url: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  halls?: ChatHall[];
+  booking?: {
+    booking_id: string;
+    status: string;
+    message: string;
+  };
 }
 
 export interface AdminStats {

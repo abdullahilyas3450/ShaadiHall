@@ -1,27 +1,47 @@
 import json
-import pandas as pd
 from datetime import datetime
 from langchain_core.tools import tool
 from .utility import _send_confirmation_email
-import json
-import pandas as pd
+from ..database import AsyncSessionLocal
+from ..models.models import Hall, Booking, User
+from sqlalchemy import select, and_
+from decimal import Decimal
 
 
-HALLS_CSV    = "/home/abdullah/Desktop/antigravity/ShaadiHall/backend/app/data/halls.csv"
-BOOKINGS_CSV = "/home/abdullah/Desktop/antigravity/ShaadiHall/backend/app/data/bookings.csv"
+async def _is_hall_available(session, hall_id, date_str):
+    """Check if a hall is available on a specific date."""
+    try:
+        event_date = datetime.strptime(date_str, "%Y-%m-%d")
+        start_of_day = event_date.replace(hour=0, minute=0, second=0)
+        end_of_day = event_date.replace(hour=23, minute=59, second=59)
+
+        query = select(Booking).where(
+            and_(
+                Booking.hall_id == hall_id,
+                Booking.status == "confirmed",
+                Booking.start_time < end_of_day,
+                Booking.end_time > start_of_day,
+            )
+        )
+        result = await session.execute(query)
+        bookings = result.scalars().all()
+        return len(bookings) == 0
+    except Exception as e:
+        print(f"Error checking availability: {e}")
+        return False
 
 
 @tool
-def search_available_halls(
+async def search_available_halls(
     event_type: str,
     guests: int,
     area: str,
     budget: float,
-    date: str
+    date: str,
 ) -> str:
     """
-    Search halls.csv filtered by event_type, guest capacity, area,
-    budget, and availability on the given date (cross-checked with bookings.csv).
+    Search halls from database filtered by capacity, area, and budget.
+    Cross-checks availability for the given date.
 
     Args:
         event_type: e.g. 'Wedding', 'Corporate Function', 'Birthday'
@@ -31,179 +51,224 @@ def search_available_halls(
         date: event date in YYYY-MM-DD format
 
     Returns:
-        JSON string with list of matching available halls (top 5)
+        JSON string with list of matching available halls
     """
-    halls_df    = pd.read_csv("/home/abdullah/Desktop/antigravity/ShaadiHall/backend/app/data/halls.csv")
-    bookings_df = pd.read_csv("/home/abdullah/Desktop/antigravity/ShaadiHall/backend/app/data/bookings.csv")
+    try:
+        async with AsyncSessionLocal() as session:
+            query = select(Hall).where(
+                and_(Hall.is_active == True, Hall.capacity >= guests)
+            )
 
-    # Halls booked on that specific date
-    booked_hall_ids = set(
-        bookings_df[
-            (bookings_df["event_date"] == date) &
-            (bookings_df["status"] == "confirmed")
-        ]["hall_id"].tolist()
-    )
+            result = await session.execute(query)
+            halls = result.scalars().all()
 
-    # Filter by capacity
-    halls_df = halls_df[
-        (halls_df["capacity_min"] <= guests) &
-        (halls_df["capacity_max"] >= guests)
-    ]
+            # Area filtering — handle multi-area queries like "DHA or Gulberg"
+            area_clean = area.replace(" or ", "|").replace("/", "|").replace(",", "|")
+            area_keywords = [
+                a.strip().lower() for a in area_clean.split("|") if a.strip()
+            ]
 
-    # Filter by budget (with 20% flexibility to surface near-budget options)
-    halls_df = halls_df[halls_df["price_per_day"] <= budget * 1.2]
+            filtered_halls = []
+            for h in halls:
+                # Area match
+                location_match = any(
+                    kw in h.location.lower() for kw in area_keywords
+                )
+                if not location_match:
+                    continue
 
-    # Filter by area (partial, case-insensitive; handles "Gulberg or DHA", "Gulberg/DHA", etc.)
-    area_clean = area.replace(" or ", "|").replace("/", "|").replace(",", "|")
-    area_keywords = [a.strip() for a in area_clean.split("|") if a.strip()]
-    area_pattern = "|".join(area_keywords)
-    halls_df = halls_df[halls_df["location"].str.contains(area_pattern, case=False, na=False)]
+                # Price match (DB stores per-hour, budget is per-day, assume 10h event)
+                estimated_day_price = float(h.price_per_hour) * 10
+                if estimated_day_price > budget * 1.2:
+                    continue
 
-    # Filter by event type (handles semicolon-separated values like "Wedding;Mehndi;Walima")
-    event_lower = event_type.lower()
-    halls_df = halls_df[
-        halls_df["event_types"].str.lower().str.contains(event_lower, na=False)
-    ]
+                # Availability check
+                if await _is_hall_available(session, h.id, date):
+                    filtered_halls.append(
+                        {
+                            "id": str(h.id),
+                            "name": h.name,
+                            "location": h.location,
+                            "capacity": h.capacity,
+                            "price_per_day": estimated_day_price,
+                            "description": h.description or "",
+                            "image_url": h.image_url or "",
+                        }
+                    )
 
-    # Remove booked halls
-    halls_df = halls_df[~halls_df["id"].isin(booked_hall_ids)]
+            if not filtered_halls:
+                return json.dumps(
+                    {
+                        "error": "No available halls found matching your criteria. "
+                        "Try a higher budget, different area, or different date."
+                    }
+                )
 
-    if halls_df.empty:
-        return json.dumps({"error": "No available halls found matching your criteria. Try a higher budget, different area, or different date."})
-
-    # Sort by rating descending, take top 5
-    halls_df = halls_df.sort_values("rating", ascending=False).head(5)
-
-    results = halls_df[[
-        "id", "name", "location", "capacity_max", "price_per_day",
-        "rating", "parking", "catering", "contact_email", "contact_phone", "description"
-    ]].to_dict(orient="records")
-
-    return json.dumps({"halls": results}, ensure_ascii=False)
+            # Return top 5
+            filtered_halls = filtered_halls[:5]
+            return json.dumps({"halls": filtered_halls}, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({"error": f"Search failed: {str(e)}"})
 
 
 @tool
-def confirm_booking(
-    hall_id: int,
+async def confirm_booking(
+    hall_id: str,
     hall_name: str,
-    customer_name: str,
     customer_email: str,
     customer_phone: str,
     event_type: str,
     event_date: str,
-    guests: int
+    guests: int,
 ) -> str:
     """
-    Confirm a hall booking: appends a new record to bookings.csv
-    and sends a confirmation email to the customer.
+    Confirm a hall booking in the database. The customer_email is provided by the
+    system context (the logged-in user). Do NOT ask the user for their email.
 
     Args:
-        hall_id: numeric ID of the hall
-        hall_name: name of the hall
-        customer_name: full name of the customer
-        customer_email: customer email address
+        hall_id: UUID of the hall to book
+        hall_name: display name of the hall
+        customer_email: email of the logged-in customer (from system context)
         customer_phone: customer phone number
-        event_type: type of event
-        event_date: YYYY-MM-DD
-        guests: number of guests
+        event_type: type of event (Wedding, Corporate, etc.)
+        event_date: event date in YYYY-MM-DD format
+        guests: number of expected guests
 
     Returns:
-        JSON with booking_id and status message
+        JSON with booking confirmation status
     """
-    # Generate booking ID
-    bookings_df = pd.read_csv(BOOKINGS_CSV)
-    last_id     = bookings_df["booking_id"].str.replace("B", "").astype(int).max()
-    new_id      = f"B{last_id + 1:03d}"
-    booked_at   = datetime.now().strftime("%Y-%m-%d")
+    try:
+        async with AsyncSessionLocal() as session:
+            # Look up user by their email (injected from session)
+            user_query = select(User).where(User.email == customer_email)
+            user_result = await session.execute(user_query)
+            user = user_result.scalars().first()
 
-    # Append to CSV
-    new_row = {
-        "booking_id":     new_id,
-        "hall_id":        hall_id,
-        "customer_name":  customer_name,
-        "customer_email": customer_email,
-        "customer_phone": customer_phone,
-        "event_type":     event_type,
-        "event_date":     event_date,
-        "guests":         guests,
-        "status":         "confirmed",
-        "booked_at":      booked_at,
-    }
-    bookings_df = pd.concat([bookings_df, pd.DataFrame([new_row])], ignore_index=True)
-    bookings_df.to_csv(BOOKINGS_CSV, index=False)
+            if not user:
+                return json.dumps(
+                    {
+                        "error": f"No user found with email {customer_email}. "
+                        "Please ensure you are registered."
+                    }
+                )
 
-    # Send confirmation email
-    email_status = _send_confirmation_email(
-        to_email=customer_email,
-        customer_name=customer_name,
-        booking_id=new_id,
-        hall_name=hall_name,
-        event_date=event_date,
-        event_type=event_type,
-        guests=guests,
-    )
+            # Get Hall details for price calculation
+            hall_query = select(Hall).where(Hall.id == hall_id)
+            hall_result = await session.execute(hall_query)
+            hall = hall_result.scalars().first()
 
-    return json.dumps({
-        "booking_id": new_id,
-        "status":     "confirmed",
-        "email_sent": email_status,
-        "message":    f"Booking {new_id} confirmed for {hall_name} on {event_date}!"
-    })
+            if not hall:
+                return json.dumps({"error": "Hall not found."})
+
+            # Calculate pricing (10-hour event day)
+            duration_hours = 10
+            total_price = float(hall.price_per_hour * duration_hours)
+
+            # Create Booking
+            event_dt = datetime.strptime(event_date, "%Y-%m-%d")
+            start_time = event_dt.replace(hour=9, minute=0)
+            end_time = event_dt.replace(hour=19, minute=0)
+
+            new_booking = Booking(
+                user_id=user.id,
+                hall_id=hall.id,
+                title=f"{event_type} for {user.full_name}",
+                start_time=start_time,
+                end_time=end_time,
+                status="confirmed",
+                total_price=total_price,
+                notes=f"Phone: {customer_phone}, Guests: {guests}",
+            )
+
+            session.add(new_booking)
+            await session.commit()
+            await session.refresh(new_booking)
+
+            booking_id_short = str(new_booking.id)[:8]
+
+            # Send confirmation email
+            email_status = _send_confirmation_email(
+                to_email=customer_email,
+                customer_name=user.full_name,
+                booking_id=booking_id_short,
+                hall_name=hall_name,
+                event_date=event_date,
+                event_type=event_type,
+                guests=guests,
+            )
+
+            return json.dumps(
+                {
+                    "booking_id": str(new_booking.id),
+                    "status": "confirmed",
+                    "hall_name": hall_name,
+                    "event_date": event_date,
+                    "total_price": total_price,
+                    "email_sent": email_status,
+                    "message": f"Mubarak ho! 🎉 Booking confirmed for {hall_name} on {event_date}!",
+                }
+            )
+    except Exception as e:
+        return json.dumps({"error": f"Booking failed: {str(e)}"})
 
 
 @tool
-def check_hall_availability(
-    hall_id: int,
-    date: str
-) -> str:
+async def check_hall_availability(hall_query: str, date: str) -> str:
     """
     Check whether a specific hall is available on a given date.
 
     Args:
-        hall_id: numeric ID of the hall to check
+        hall_query: UUID or Name of the hall
         date: event date in YYYY-MM-DD format
 
     Returns:
         JSON string indicating availability status
     """
+    try:
+        async with AsyncSessionLocal() as session:
+            hall = None
 
-    halls_df    = pd.read_csv("/home/abdullah/Desktop/antigravity/ShaadiHall/backend/app/data/halls.csv")
-    bookings_df = pd.read_csv("/home/abdullah/Desktop/antigravity/ShaadiHall/backend/app/data/bookings.csv")
+            # Try finding by UUID first
+            try:
+                from uuid import UUID
 
-    # Verify the hall exists
-    hall_row = halls_df[halls_df["id"] == hall_id]
-    if hall_row.empty:
-        return json.dumps({
-            "available": False,
-            "error": f"No hall found with ID {hall_id}."
-        })
+                hall_id_uuid = UUID(hall_query)
+                hall_q = select(Hall).where(Hall.id == hall_id_uuid)
+                result = await session.execute(hall_q)
+                hall = result.scalars().first()
+            except Exception:
+                pass
 
-    hall_name = hall_row.iloc[0]["name"]
+            # Fallback: search by name
+            if not hall:
+                hall_q = select(Hall).where(Hall.name.ilike(f"%{hall_query}%"))
+                result = await session.execute(hall_q)
+                hall = result.scalars().first()
 
-    # Check for a confirmed booking on that date for this hall
-    conflict = bookings_df[
-        (bookings_df["hall_id"] == hall_id) &
-        (bookings_df["event_date"] == date) &
-        (bookings_df["status"] == "confirmed")
-    ]
+            if not hall:
+                return json.dumps(
+                    {
+                        "available": False,
+                        "error": f"No hall found matching '{hall_query}'.",
+                    }
+                )
 
-    if not conflict.empty:
-        booking = conflict.iloc[0]
-        return json.dumps({
-            "available": False,
-            "hall_id": hall_id,
-            "hall_name": hall_name,
-            "date": date,
-            "message": (
-                f"Sorry, {hall_name} is not available on {date}. "
-                f"It is already booked for a {booking['event_type']} event."
+            is_available = await _is_hall_available(session, hall.id, date)
+
+            return json.dumps(
+                {
+                    "available": is_available,
+                    "hall_id": str(hall.id),
+                    "hall_name": hall.name,
+                    "date": date,
+                    "capacity": hall.capacity,
+                    "price_per_day": float(hall.price_per_hour) * 10,
+                    "message": (
+                        f"Great news! {hall.name} is available on {date}."
+                        if is_available
+                        else f"Sorry, {hall.name} is already booked on {date}."
+                    ),
+                }
             )
-        })
-
-    return json.dumps({
-        "available": True,
-        "hall_id": hall_id,
-        "hall_name": hall_name,
-        "date": date,
-        "message": f"Great news! {hall_name} is available on {date}."
-    })
+    except Exception as e:
+        return json.dumps({"error": f"Availability check failed: {str(e)}"})

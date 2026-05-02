@@ -1,48 +1,42 @@
-from langchain_openrouter import ChatOpenRouter
+import re
+import json
+import uuid
 from typing import Annotated, TypedDict
 
-# from langchain_anthropic import ChatAnthropic
-
+from langchain_openrouter import ChatOpenRouter
 from langchain_core.messages import SystemMessage
-from .tools import search_available_halls, confirm_booking, check_hall_availability
 from langgraph.graph.message import add_messages
-from langgraph.graph import  END
-from dotenv import load_dotenv      
-load_dotenv()  # Load environment variables from .env file
+from langgraph.graph import END
+from dotenv import load_dotenv
 
+from .tools import search_available_halls, confirm_booking, check_hall_availability
 
-
+load_dotenv()
 
 
 class BookingState(TypedDict):
     messages: Annotated[list, add_messages]
 
 
-
 TOOLS = [search_available_halls, confirm_booking, check_hall_availability]
-
-# llm= ChatGoogleGenerativeAI(
-#     model="gemini-3-flash-preview",
-#     temperature=1.0,  # Gemini 3.0+ defaults to 1.0
-#     max_tokens=None,
-#     timeout=None,
-#     max_retries=2,
-#     api_key="AIzaSyBmSsSLIuOKoNMrntNqvjKNs_8gL5j2vNE"
-#     # other params...
-# ).bind_tools(TOOLS)
 
 llm = ChatOpenRouter(
     model="openrouter/free",
     temperature=0,
-    max_tokens=500,
+    max_tokens=1024,
     max_retries=2,
 ).bind_tools(TOOLS)
+
 
 SYSTEM_PROMPT = """You are a warm and welcoming hall booking assistant for ShadiHall.pk in Lahore, Pakistan.
 Your sole purpose is helping customers find and book the perfect banquet hall for their special event.
 Do NOT respond to any off-topic questions. If asked something unrelated, politely redirect:
 "JazakAllah for asking, but I'm only here to help with hall bookings — shall we continue?"
 
+IMPORTANT — USER IDENTITY:
+- The system automatically provides the customer's name and email in the context.
+- NEVER ask the customer for their name or email address — you already have it.
+- When confirming a booking, use the email from the system context to pass to the confirm_booking tool.
 
 INFORMATION GATHERING (one question at a time, warmly phrased):
 1. "May I ask what type of event you're planning? (Wedding, Mehndi, Walima, Corporate, Birthday, etc.)"
@@ -52,28 +46,31 @@ INFORMATION GATHERING (one question at a time, warmly phrased):
 5. Event date — accept natural language ("20th May 2026"), then confirm warmly:
    "Lovely! Just to confirm, that's 20 May 2026 (2026-05-20) — is that correct?"
 
+NOTE: If the user provides multiple details at once (e.g. "wedding in DHA for 200 guests on May 20 with 500k budget"),
+extract ALL provided details and only ask for the missing ones. Do NOT re-ask for information already given.
+
 TOOL USAGE — TWO PATHS:
 
 PATH A — Standard search flow:
 - After all 5 details collected: call search_available_halls with all parameters
 - Results are already availability-filtered — present as a numbered list with a warm intro:
   "Great news! Here are the best halls available for your event:"
-  (name, location, capacity, price/day, rating, parking, catering)
-- User picks a hall → proceed directly to customer details (no availability re-check needed)
+  (Include: name, location, capacity, price/day, and a brief description)
+- User picks a hall (either by number, name, or clicking "Book Now" which sends "I want to book [hall name] (Hall ID: xxx)")
+  → proceed to collect phone number, then call confirm_booking
 
-PATH B — User requests a specific hall by name directly (e.g. "I want Queen Palace on 20 May"):
-- Call check_hall_availability(hall_name, date) immediately
+PATH B — User requests a specific hall by name directly:
+- Call check_hall_availability(hall_query=hall_name, date=date) immediately
   - If AVAILABLE: "Wonderful choice! [Hall Name] is available on that date."
     Collect any missing details then proceed to booking
-  - If UNAVAILABLE: "I'm so sorry, [Hall Name] is fully booked on that date. 
-    Let me help you find something just as beautiful — shall I search for similar halls 
-    or would you like to try a different date?"
+  - If UNAVAILABLE: suggest alternatives or a different date
 
 BOOKING COMPLETION (both paths):
-- Collect: full name, email address, phone number (one at a time, politely)
-- Call confirm_booking with all details
-- End warmly: "Mubarak ho! 🎉 Your booking is confirmed. Your booking ID is [ID] and a 
-  confirmation email has been sent to you. We wish you a wonderful event!"
+- You already have the customer's name and email from the system context.
+- Only ask for: phone number
+- Then call confirm_booking with: hall_id, hall_name, event_type, event_date, guests, customer_phone, customer_email (from context)
+- End warmly: "Mubarak ho! 🎉 Your booking is confirmed. Your booking ID is [ID].
+  We wish you a wonderful event!"
 
 RESPONSE STYLE:
 - Warm, polite, and welcoming — like a helpful friend, not a form
@@ -81,15 +78,42 @@ RESPONSE STYLE:
 - Ask only ONE question per message
 - Always acknowledge the user's response before asking the next question
 - If search returns no results: apologize warmly and suggest widening budget or trying another area
-- Never fabricate hall data — only use results from tool responses"""
+- Never fabricate hall data — only use results from tool responses
+- Keep responses concise but warm"""
 
 
 async def agent_node(state: BookingState):
     messages = [SystemMessage(content=SYSTEM_PROMPT)] + state["messages"]
     response = await llm.ainvoke(messages)
-    return {
-        "messages": state["messages"] + [response]
-    }
+
+    # Fallback: Parse <TOOLCALL> tags if the model outputs them as text
+    if not (hasattr(response, "tool_calls") and response.tool_calls) and isinstance(
+        response.content, str
+    ):
+        match = re.search(
+            r"TOOLCALL>(\[.*?\])</TOOLCALL>", response.content, re.DOTALL
+        )
+        if match:
+            try:
+                tool_calls_raw = json.loads(match.group(1))
+                formatted_tool_calls = []
+                for tc in tool_calls_raw:
+                    formatted_tool_calls.append(
+                        {
+                            "name": tc["name"],
+                            "args": tc.get("arguments", tc.get("args", {})),
+                            "id": f"call_{len(formatted_tool_calls)}_{str(uuid.uuid4())[:8]}",
+                            "type": "tool_call",
+                        }
+                    )
+                response.tool_calls = formatted_tool_calls
+                # Clear the raw text content since we parsed the tool calls
+                response.content = ""
+            except Exception as e:
+                print(f"Error parsing manual tool call: {e}")
+
+    return {"messages": state["messages"] + [response]}
+
 
 def should_continue(state: BookingState):
     last = state["messages"][-1]

@@ -21,9 +21,11 @@ async def chat(
     current_user: User = Depends(get_current_user)
 ):
     chat_service = ChatService(db)
-    response_text = await chat_service.get_response(
+    response_data = await chat_service.get_response(
         user_id=str(current_user.id),
+        user_email=current_user.email,
+        user_name=current_user.full_name,
         message=chat_data.message,
         history=chat_data.conversation_history
     )
-    return {"message": response_text}
+    return response_data
