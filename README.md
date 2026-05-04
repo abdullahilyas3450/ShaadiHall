@@ -39,7 +39,7 @@ ShaadiHall simplifies the complex process of venue booking in Pakistan (starting
 ### Backend
 - **Framework**: FastAPI (Python 3.12)
 - **AI Engine**: LangGraph + LangChain (Stateful Agent)
-- **LLM**: Claude 3.5 Sonnet (via Anthropic API)
+- **LLM**: gemini 2.5 flash used via openrouter
 - **Database**: Supabase (PostgreSQL)
 - **ORM**: SQLAlchemy (Async)
 - **Real-time**: WebSockets for admin live feeds
@@ -73,7 +73,7 @@ ShaadiHall/
 - Node.js 18+
 - Python 3.12+
 - Supabase Account
-- Anthropic API Key
+- openrouter API Key
 
 ### 2. Backend Setup
 1. Navigate to backend: `cd backend`
