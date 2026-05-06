@@ -13,8 +13,6 @@ export const AdminSidebar = () => {
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Bookings', href: '/admin/bookings', icon: Calendar },
     { name: 'Hall Management', href: '/admin/halls', icon: Search },
-    { name: 'Users', href: '/admin/users', icon: Users },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   return (
