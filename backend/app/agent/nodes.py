@@ -14,6 +14,7 @@ from .tools import search_available_halls, confirm_booking, check_hall_availabil
 load_dotenv()
 
 
+
 class BookingState(TypedDict):
     messages: Annotated[list, add_messages]
 
@@ -26,6 +27,7 @@ llm = ChatOpenRouter(
     max_tokens=1024,
     max_retries=2,
 ).bind_tools(TOOLS)
+
 
 
 SYSTEM_PROMPT = """You are a warm and welcoming hall booking assistant for ShadiHall.pk in Lahore, Pakistan.

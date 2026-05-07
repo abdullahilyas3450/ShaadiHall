@@ -1,0 +1,6 @@
+->make the booking tool a subgraph which is activated when the user select a specid=fic haal by the user
+-> if the user want to cancel a booking handle that tool
+-> add auth tokens in this make a seperate admin of haals and user page
+->add DB supabase and vector db in the project
+->create api of backend and 
+-> connect with front end
