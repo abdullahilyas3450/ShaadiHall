@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import ChatWidget from "@/components/Chatbot/ChatWidget";
+import "@/app/globals.css";
+import { AuthProvider } from "@/store/authStore";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ShaadiHall.com | AI-Powered Event Hall Booking in Lahore",
-  description: "Find and book the perfect event hall in Lahore with our AI assistant. Instant availability, best prices, and zero hassle.",
+  title: "ShaadiHall - Premium Hall Booking System",
+  description: "Book the perfect venue for your special event with ease.",
 };
 
 export default function RootLayout({
@@ -18,14 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-gray-50 text-gray-900 flex flex-col min-h-screen`}>
-        <Navbar />
-        <main className="flex-grow">
+    <html lang="en" className="h-full bg-gray-50">
+      <body className={cn(inter.className, "h-full antialiased text-gray-900")}>
+        <AuthProvider>
           {children}
-        </main>
-        <Footer />
-        <ChatWidget />
+        </AuthProvider>
       </body>
     </html>
   );
