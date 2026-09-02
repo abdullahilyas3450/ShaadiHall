@@ -7,8 +7,8 @@ import smtplib
 
 
 
-EMAIL_SENDER   = os.getenv("EMAIL_SENDER", "f2022266397@umt.edu.pk")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "Musa125@")
+EMAIL_SENDER   = os.getenv("EMAIL_SENDER", "")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "")
 SMTP_HOST      = "smtp.gmail.com"
 SMTP_PORT      = 587
 
